@@ -1,6 +1,44 @@
 <!doctype html>
-<title>Accounts</title>
-<link rel='stylesheet' type='text/css' href="{{ url_for('static', filename='style.css') }}" />
-<div class="page">
-  <h1>Accounts</h1>
-</div>
+<html lang="en">
+  <head>
+    <title>Accounts</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel='stylesheet' type='text/css' href="{{ url_for('static', filename='bootstrap.css') }}" />
+    <link rel='stylesheet' type='text/css' href="{{ url_for('static', filename='style.css') }}" />
+  </head>
+  <body>
+    {% block navbar %}
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+	<div class="container">
+	  <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+	    <span class="icon-bar"></span>
+	    <span class="icon-bar"></span>
+	  </button>
+	  <a class="brand" href="#">Accounts</a>
+	  <div class="nav-collapse">
+	    <ul class="nav">
+	    </ul>
+	    {% block navbar_right %}
+	    <ul class="nav pull-right">
+	      <li>TODO: Login</li>
+	    </ul>
+	    {% endblock %}
+	  </div>
+	</div>
+      </div>
+      {% endblock %}
+
+	    
+      <div class="container page">
+	<div class="content">
+	  {% block content %}
+	  {% endblock %}
+	</div>
+    </div>
+      {% block js_footer %}
+      <script type="text/javascript" src="{{ url_for('static', filename='bootstrap.js') }}"></script>
+      {% endblock %}
+  </body>
+</html>
