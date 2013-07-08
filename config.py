@@ -1,6 +1,4 @@
-DATABASE = '/tmp/financial-planner.db'
+DATABASE = '/tmp/personal-ledger.db'
 DEBUG = True
 SECRET_KEY = 'development key'
-USERNAME = 'admin'
-PASSWORD = 'default'
 
