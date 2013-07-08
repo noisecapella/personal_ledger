@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% block content %}
+<form class="form" method="post">
+  <label for='title'>Name</label>
+  <input type="text" name="title" value="" />
+  <label for='account_type'>Account type</label>
+  <select name="account_type_id">
+    {% for account_type in account_types %}
+    <option name="{{account_type['id']}}">{{account_type['title']}}</option>
+    {% endfor %}
+  </select>
+
+  <br /><input type="submit" />
+</form>
+{% endblock %}

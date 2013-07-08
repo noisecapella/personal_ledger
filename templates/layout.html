@@ -1,11 +1,18 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <title>Accounts</title>
+    <title>Personal Ledger</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <link rel='stylesheet' type='text/css' href="{{ url_for('static', filename='bootstrap.css') }}" />
     <link rel='stylesheet' type='text/css' href="{{ url_for('static', filename='style.css') }}" />
+
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+    </style>
   </head>
   <body>
     {% block navbar %}
@@ -16,7 +23,7 @@
 	    <span class="icon-bar"></span>
 	    <span class="icon-bar"></span>
 	  </button>
-	  <a class="brand" href="#">Accounts</a>
+	  <a class="brand" href="{{ url_for(".accounts") }}">Accounts</a>
 	  <div class="nav-collapse">
 	    <ul class="nav">
 	    </ul>
@@ -28,17 +35,29 @@
 	  </div>
 	</div>
       </div>
-      {% endblock %}
-
-	    
-      <div class="container page">
-	<div class="content">
-	  {% block content %}
-	  {% endblock %}
-	</div>
     </div>
-      {% block js_footer %}
-      <script type="text/javascript" src="{{ url_for('static', filename='bootstrap.js') }}"></script>
-      {% endblock %}
+    {% endblock %}
+
+    
+    <div class="container">
+      <div class="content">
+	<div class="messages">
+	  {% with messages = get_flashed_messages() %}
+	  {% if messages %}
+	  <ul class="flashes">
+	    {% for message in messages %}
+	    <h4 style='color: red;'>{{ message }}</h4><br />
+	    {% endfor %}
+	  </ul>
+	  {% endif %}
+	  {% endwith %}
+	</div>
+	{% block content %}
+	{% endblock %}
+      </div>
+    </div>
+    {% block js_footer %}
+    <script type="text/javascript" src="{{ url_for('static', filename='bootstrap.js') }}"></script>
+    {% endblock %}
   </body>
 </html>

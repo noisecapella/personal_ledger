@@ -1,4 +1,23 @@
 {% extends "layout.html" %}
-{% block body %}
-Hello, world!
+{% block content %}
+<table class="table table-striped table-bordered">
+
+  <tr>
+    <th>Title</th>
+    <th>Withdrawal</th>
+    <th>Deposit</th>
+  </tr>
+  {% for account in accounts %}
+  <tr>
+    <td>{{ account["title"] }}</td>
+    <td>{{ account["withdrawal"] }}</td>
+    <td>{{ account["deposit"] }}</td>
+  </tr>
+  {% else %}
+  <tr><td>No items</td></tr>
+  {% endfor %}
+
+</table>
+
+<h3><a href="{{ url_for('.add_account') }}">Add new account</a></h3>
 {% endblock %}
