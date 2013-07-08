@@ -1,0 +1,1 @@
+This is a Flask app to store and display personal financial transactions taken from bank statements. It's meant for personal use similar to GNUCash or Quicken.
