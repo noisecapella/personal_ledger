@@ -24,6 +24,7 @@
 	    <span class="icon-bar"></span>
 	  </button>
 	  <a class="brand" href="{{ url_for(".accounts") }}">Accounts</a>
+	  <a class="brand" href="{{ url_for(".transactions") }}">Transactions</a>
 	  <div class="nav-collapse">
 	    <ul class="nav">
 	    </ul>
@@ -57,6 +58,7 @@
       </div>
     </div>
     {% block js_footer %}
+    <script type="text/javascript" src="{{ url_for('static', filename='jquery-2.0.3.min.js') }}"</script>
     <script type="text/javascript" src="{{ url_for('static', filename='bootstrap.js') }}"></script>
     {% endblock %}
   </body>
