@@ -16,6 +16,10 @@
     <td>{{ transaction.account_name }}</td>
     <td>{{ transaction.other_transaction_id }}</td>
   </tr>
+  {% else %}
+  <tr>
+    <td colspan="5">No transactions</td>
+  </tr>
   {% endfor %}
 </table>
 <h3><a href="{{ url_for('.import_transactions') }}">Import transactions</a></h3>
