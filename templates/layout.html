@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <title>Personal Ledger</title>
+    <title>Personal Ledger - {{ title }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <link rel='stylesheet' type='text/css' href="{{ url_for('static', filename='bootstrap.css') }}" />
@@ -23,8 +23,8 @@
 	    <span class="icon-bar"></span>
 	    <span class="icon-bar"></span>
 	  </button>
-	  <a class="brand" href="{{ url_for(".accounts") }}">Accounts</a>
-	  <a class="brand" href="{{ url_for(".transactions") }}">Transactions</a>
+	  <a class="brand" style="{{ "font-weight: bold" if title == "Accounts"}}" href="{{ url_for(".accounts") }}">Accounts</a>
+	  <a class="brand" style="{{ "font-weight: bold" if title == "Transactions"}}" href="{{ url_for(".transactions") }}">Transactions</a>
 	  <div class="nav-collapse">
 	    <ul class="nav">
 	    </ul>
