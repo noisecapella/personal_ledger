@@ -4,27 +4,11 @@ from flask import Flask, request, session, g, redirect, url_for, \
 import csv
 from contextlib import closing
 
+from flask.ext.sqlalchemy import SQLAlchemy
+
 app = Flask(__name__)
 app.config.from_object("config")
-
-@app.before_request
-def before_request():
-    g.db = connect_db()
-
-@app.teardown_request
-def teardown_request(exception):
-    db = getattr(g, 'db', None)
-    if db is not None:
-        db.close()
-
-def init_db():
-    with closing(connect_db()) as db:
-        with app.open_resource('schema.sql', mode='r') as f:
-            db.cursor().executescript(f.read())
-        db.commit()
-
-def connect_db():
-    return sqlite3.connect(app.config['DATABASE'])
+db = SQLAlchemy(app)
 
 @app.route('/')
 def index():
@@ -68,18 +52,6 @@ def import_transactions():
     if request.method == 'POST':
         try:
             file = request.files['file']
-            if file:
-                lines = [line for line in csv.reader(file)]
-                max_length = 0
-                for line in lines:
-                    max_length = max(max_length, len(line))
-                
-                if 'selections' in request.form:
-                    selections = request.form['selections']
-                else:
-                    selections = ["Empty"] * max_length
-            else:
-                flash("File was not uploaded")
         except Exception as e:
             flash("Exception: %s" % e)
             
@@ -88,13 +60,33 @@ def import_transactions():
     return render_template('import_transactions.html', lines=lines, selections=selections, options=options, title="Transactions")
 
 
-@app.route('/rules', methods=['POST', 'GET'])
+@app.route('/rules', methods=['GET', 'POST'])
 def rules():
-    if request.method == 'POST':
-        flash('TODO')
-        pass
-    return render_template('rules.html', title="Rules")
+    if request.method == "POST":
+        regex = request.form['regex']
+        account_id = request.form['account_id']
+        #cur = g.db.execute('INSERT INTO rules ?, ?', 
+        #TODO
+        return redirect(url_for('rules'))
 
+    cur = g.db.execute('SELECT regex, accounts.full_title FROM rules JOIN accounts ON rules.account_id == accounts.id')
+    rules = [dict(regex=row[0], account=row[1]) for row in cur.fetchall()]
+    return render_template('rules.html', title="Rules", rules=rules)
 
+@app.route('/categorize_transactions', methods=['POST'])
+def categorize_transactions():
+    file = request.files['file']
+    if file:
+        lines = [line for line in csv.reader(file)]
+        max_length = 0
+        for line in lines:
+            max_length = max(max_length, len(line))
+            
+    else:
+        flash("File was not uploaded")
+
+    return render_template('categorize_transactions.html', lines=lines)
+    
+    
 if __name__ == "__main__":
     app.run()
