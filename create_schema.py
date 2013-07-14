@@ -1,5 +1,7 @@
 from personal_ledger import db
 from models.account import Account
+from models.transaction import Transaction
+from models.rule import Rule
 
 def create_schema():
     db.drop_all()
@@ -49,6 +51,7 @@ def create_schema():
                             'Gas':None,
                             'Water':None}}}
     write_account_tree(account_tree)
+    db.session.commit()
 
 def write_account_tree(account_tree, parent = None):
     if not account_tree:
@@ -56,6 +59,7 @@ def write_account_tree(account_tree, parent = None):
 
     for name, children in account_tree.iteritems():
         account = Account(name, parent)
+        db.session.add(account)
         write_account_tree(children, account)
 if __name__ == "__main__":
     create_schema()
