@@ -1,5 +1,6 @@
 from personal_ledger import app
 from models import *
+from forms import *
 from flask import Flask, request, session, g, redirect, url_for, \
      abort, render_template, flash
 import csv
@@ -56,17 +57,19 @@ def import_transactions():
 
 @app.route('/rules', methods=['GET', 'POST'])
 def rules():
-    if request.method == "POST":
-        regex = request.form['regex']
-        account_id = request.form['account_id']
-        rule = Rule(regex, Account.query())
+    form = CreateRuleForm(request.form)
+    if request.method == "POST" and form.validate():
+        regex = form.regex.data
+        account_id = form.account_id.data
+        weight = form.weight.data
+        rule = Rule(regex, Account.query.get(account_id), weight)
         db.session.add(rule)
         db.session.commit()
         return redirect(url_for('rules'))
 
-    cur = g.db.execute('SELECT regex, accounts.full_title FROM rules JOIN accounts ON rules.account_id == accounts.id')
-    rules = [dict(regex=row[0], account=row[1]) for row in cur.fetchall()]
-    return render_template('rules.html', title="Rules", rules=rules)
+    rules = Rule.query.all()
+    
+    return render_template('rules.html', title="Rules", rules=rules, form=form)
 
 @app.route('/categorize_transactions', methods=['POST'])
 def categorize_transactions():

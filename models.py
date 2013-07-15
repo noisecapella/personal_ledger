@@ -20,10 +20,12 @@ class Rule(db.Model):
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     regex = db.Column(db.Text, nullable=False)
     account_id = db.Column(db.Integer, db.ForeignKey("account.id"), nullable=False)
+    weight = db.Column(db.Float, nullable=False)
 
-    def __init__(self, regex, account):
+    def __init__(self, regex, account, weight):
         self.regex = regex
         self.account = account
+        self.weight = weight
 
 class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
