@@ -1,11 +1,10 @@
-from flask.ext.sqlalchemy import SQLAlchemy
+from personal_ledger import db
 
-db = SQLAlchemy()
 class Account(db.Model):
     id = db.Column(db.Integer, autoincrement = True, primary_key=True)
     title = db.Column(db.Text, unique=True, nullable=False)
     full_title = db.Column(db.Text, unique=True, nullable=False)
-    parent_id = db.Column(db.Integer, db.ForeignKey('account.id'), nullable=True)
+    parent_id = db.Column(db.Integer, db.ForeignKey("account.id"), nullable=True)
     
     def __init__(self, title, parent):
         self.title = title
@@ -20,6 +19,7 @@ class Account(db.Model):
 class Rule(db.Model):
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     regex = db.Column(db.Text, nullable=False)
+    account_id = db.Column(db.Integer, db.ForeignKey("account.id"), nullable=False)
 
     def __init__(self, regex, account):
         self.regex = regex
@@ -43,10 +43,10 @@ class Transaction(db.Model):
         # note that other_transaction must be set before committing
 
 Transaction.account = db.relation('Account', backref='transaction')
-Transaction.other_transaction = db.relation(Transaction, backref='transaction', uselist=False)
+Transaction.other_transaction = db.relation(Transaction, remote_side=[Transaction.id], uselist=False)
 
 
 Rule.account = db.relation('Account', backref='rule')
 
-Account.parent = db.relation('Account', backref='account')
+Account.parent = db.relation('Account', remote_side=[Account.id])
 

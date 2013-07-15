@@ -1,7 +1,5 @@
 from personal_ledger import db
-from models.account import Account
-from models.transaction import Transaction
-from models.rule import Rule
+from models import Account, Transaction, Rule
 
 def create_schema():
     db.drop_all()
