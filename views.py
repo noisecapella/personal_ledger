@@ -4,6 +4,8 @@ from flask import Flask, request, session, g, redirect, url_for, \
      abort, render_template, flash
 import csv
 
+from categorize import categorize_expenses, categorize_columns, CATEGORIZE_COLUMN_OPTIONS
+
 @app.route('/')
 def index():
     return redirect(url_for('accounts'))
@@ -75,9 +77,12 @@ def categorize_transactions():
         for line in lines:
             max_length = max(max_length, len(line))
             
+        select_columns = categorize_columns(lines)
+        select_expenses = categorize_expenses(lines)
     else:
         flash("File was not uploaded")
 
-    return render_template('categorize_transactions.html', lines=lines)
+    return render_template('categorize_transactions.html', lines=lines, select_columns=select_columns,
+                           select_expenses=select_expenses, options=[title for title, item in CATEGORIZE_COLUMN_OPTIONS])
     
     
