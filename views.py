@@ -1,5 +1,8 @@
 from personal_ledger import app
-from models import Account, Transaction, Rule
+from models import *
+from flask import Flask, request, session, g, redirect, url_for, \
+     abort, render_template, flash
+import csv
 
 @app.route('/')
 def index():
@@ -12,7 +15,7 @@ def transactions():
 
 @app.route('/accounts')
 def accounts():
-    accounts = Account.query.all()
+    accounts = Account.query.order_by(Account.full_title)
     return render_template('accounts.html', accounts=accounts, title="Accounts")
 
 @app.route('/add_account', methods=['POST', 'GET'])

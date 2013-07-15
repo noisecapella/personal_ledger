@@ -25,6 +25,7 @@
 	  </button>
 	  <a class="brand" style="{{ "font-weight: bold" if title == "Accounts"}}" href="{{ url_for(".accounts") }}">Accounts</a>
 	  <a class="brand" style="{{ "font-weight: bold" if title == "Transactions"}}" href="{{ url_for(".transactions") }}">Transactions</a>
+	  <a class="brand" style="{{ "font-weight: bold" if title == "Rules"}}" href="{{ url_for(".rules") }}">Rules</a>
 	  <div class="nav-collapse">
 	    <ul class="nav">
 	    </ul>
@@ -60,6 +61,9 @@
     {% block js_footer %}
     <script type="text/javascript" src="{{ url_for('static', filename='jquery-2.0.3.min.js') }}"</script>
     <script type="text/javascript" src="{{ url_for('static', filename='bootstrap.js') }}"></script>
+    {% endblock %}
+    {% block js_footer_extra %}
+
     {% endblock %}
   </body>
 </html>

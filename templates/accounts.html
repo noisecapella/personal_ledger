@@ -9,9 +9,9 @@
   </tr>
   {% for account in accounts %}
   <tr>
-    <td>{{ account["title"] }}</td>
-    <td>{{ account["withdrawal"] }}</td>
-    <td>{{ account["deposit"] }}</td>
+    <td>{{ account.full_title }}</td>
+    <td>{{ account.withdrawal or 0.0 }}</td>
+    <td>{{ account.deposit or 0.0 }}</td>
   </tr>
   {% else %}
   <tr><td>No items</td></tr>

@@ -1,30 +1,20 @@
 {% extends "layout.html" %}
 {% block content %}
-<form class="form" method="post" enctype="multipart/form-data">
-  <input type="file" name="file" onchange="this.form.submit()" /><br />
+<form class="form" name="form" method="post" enctype="multipart/form-data" action="{{ url_for('.categorize_transactions') }}">
+  <input type="file" name="file" id="file" /><br />
+  <input type="button" value="Upload" />
 </form>
 
-{% if lines %}
-<table class="table table-striped table-bordered">
-  {% if selections %}
-  <tr>
-    {% for selection in selections %}
-    <th><select name='selection_{{ loop.index }}'>
-	{% for option in options %}
-	<option value='{{ option.value }}' {{ 'checked' if option.value == selection }}>{{ option.description }}</option>
-	{% endfor %}
-	</select>
-    </th>
-    {% endfor %}
-  </tr>
-  {% endif %}
-  {% for line in lines %}
-  <tr>
-    {% for item in line %}
-    <td>{{ item }}</td>
-    {% endfor %}
-  </tr>
-  {% endfor %}
-</table>
-{% endif %}
+{% endblock %}
+
+{% block js_footer_extra %}
+<script type="text/javascript">
+$(function() {
+
+  $("#file").change(function() {
+      $("#file").parent().submit();
+  });
+});
+</script>
+
 {% endblock %}
