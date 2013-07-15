@@ -1,26 +1,5 @@
 {% extends "layout.html" %}
 {% block content %}
-<table class="table table-striped table-bordered">
-  <tr>
-    <th>Description</th>
-    <th>Withdrawal</th>
-    <th>Deposit</th>
-    <th>Account</th>
-    <th>Other transaction id</th>
-  </tr>
-  {% for transaction in transactions %}
-  <tr>
-    <td>{{ transaction.description }}</td>
-    <td>{{ transaction.withdrawal }}</td>
-    <td>{{ transaction.deposit }}</td>
-    <td>{{ transaction.account_name }}</td>
-    <td>{{ transaction.other_transaction_id }}</td>
-  </tr>
-  {% else %}
-  <tr>
-    <td colspan="5">No transactions</td>
-  </tr>
-  {% endfor %}
-</table>
+{% include "transactions_partial.html" %}
 <h3><a href="{{ url_for('.import_transactions') }}">Import transactions</a></h3>
 {% endblock %}

@@ -86,7 +86,7 @@ def categorize_expenses(lines, column_options):
         print("No description column found")
         return [default_account] * len(lines)
 
-    def best_match(regex, item):
+    def best_match(item):
         # for now any match is a good match
         # TODO: make this better
         for rule in rules:

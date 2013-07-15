@@ -10,9 +10,11 @@
     <input type="submit" />
   </dl>  
 </form>
-<button name="test">Test regex</button>
+<button name="test_regex" id="test_regex">Test regex</button>
 
+<div id="transactions">
 
+</div>
 
 <br /><br />
 <h4>Rules</h4>
@@ -33,4 +35,18 @@
   {% endfor %}
 </table>
 
+{% endblock %}
+{% block js_footer_extra %}
+<script type="text/javascript">
+$(function() {
+  $("#test_regex").click(function() {
+    $.ajax({
+      url: "{{url_for('.transactions_partial')}}"
+    }).done(function(data) {
+      $("#transactions").html(data);
+    });
+    return false;
+  });
+});
+</script>
 {% endblock %}

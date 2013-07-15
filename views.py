@@ -81,11 +81,27 @@ def categorize_transactions():
             max_length = max(max_length, len(line))
             
         select_columns = categorize_columns(lines)
-        select_expenses = categorize_expenses(lines)
+        select_expenses = categorize_expenses(lines, select_columns)
     else:
         flash("File was not uploaded")
 
+    options = CATEGORIZE_COLUMN_OPTIONS
+    accounts = Account.query.order_by(Account.full_title).all()
+
+    pairs = [(lines[i], select_expenses[i]) for i in xrange(len(lines))]
+
     return render_template('categorize_transactions.html', lines=lines, select_columns=select_columns,
-                           select_expenses=select_expenses, options=[title for title, item in CATEGORIZE_COLUMN_OPTIONS])
+                           pairs=pairs, options=options, accounts=accounts)
     
     
+@app.route('/transactions_partial', methods=['GET'])
+def transactions_partial():
+    transactions = Transaction.query.all()
+    regex = request.args.get('regex')
+    if regex:
+        transactions = [transaction for transaction in transactions
+                        if re.match(regex, transaction.description)]
+
+    return render_template('transactions_partial.html', transactions=transactions)
+        
+
