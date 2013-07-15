@@ -45,7 +45,7 @@ def guess(line):
     # probably not important given the small number of validations
     validations = {title: [bool(option.validate(c)) for c in line]
                    for title, option in CATEGORIZE_COLUMN_OPTIONS_KEYS.items()}
-    print validations
+
     while not all(matches_made):
         validation_counts = [0] * len(line)
         for title, validation_row in validations.items():
@@ -53,23 +53,30 @@ def guess(line):
                 if validation_row[i]:
                     validation_counts[i] += 1
 
-        min_validation_index = 0
+        
+        max_validation_index = None
         for i in xrange(len(line)):
-            if validation_counts[min_validation_index] < validation_counts[i]:
-                min_validation_index = i
+            if matches_made[i]:
+                continue
+            elif max_validation_index is None:
+                max_validation_index = i
+            elif validation_counts[max_validation_index] > validation_counts[i]:
+                max_validation_index = i
 
+        print matches_made, max_validation_index, validations, validation_counts
         for title, row in validations.items():
-            if row[min_validation_index]:
-                matches_made[min_validation_index] = CATEGORIZE_COLUMN_OPTIONS_KEYS[title]
+            if row[max_validation_index]:
+                matches_made[max_validation_index] = CATEGORIZE_COLUMN_OPTIONS_KEYS[title]
 
                 break
         else:
-            raise Exception("No valid items")
+            raise Exception("No match made this round")
 
         for title, row in validations.items():
-            row[min_validation_index] = False
+            row[max_validation_index] = False
 
-
+        for i in xrange(len(line)):
+            validations[matches_made[max_validation_index].title][i] = False
 
     return matches_made
 
@@ -104,7 +111,7 @@ def categorize_expenses(lines, column_options):
 
 def categorize_columns(lines):
     if not lines:
-        return []
+        return list()
     
     return guess(lines[0])
 
