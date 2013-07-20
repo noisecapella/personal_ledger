@@ -1,4 +1,4 @@
-from personal_ledger import app
+from loader import app
 from models import *
 from forms import *
 from flask import Flask, request, session, g, redirect, url_for, \
@@ -92,7 +92,11 @@ def categorize_transactions():
 
     return render_template('categorize_transactions.html', lines=lines, select_columns=select_columns,
                            pairs=pairs, options=options, accounts=accounts)
-    
+
+
+@app.route('/save_transactions', methods=['POST'])
+def save_transactions():
+    pass
     
 @app.route('/transactions_partial', methods=['GET'])
 def transactions_partial():

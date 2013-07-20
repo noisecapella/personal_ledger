@@ -1,7 +1,7 @@
-from personal_ledger import db
+from loader import db
 
 class Account(db.Model):
-    id = db.Column(db.Integer, autoincrement = True, primary_key=True)
+    id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     title = db.Column(db.Text, unique=True, nullable=False)
     full_title = db.Column(db.Text, unique=True, nullable=False)
     parent_id = db.Column(db.Integer, db.ForeignKey("account.id"), nullable=True)

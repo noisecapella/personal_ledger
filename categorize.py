@@ -9,7 +9,7 @@ class DateOption:
         try:
             dateutil.parser.parse(s)
             return True
-        except:
+        except ValueError:
             return False
 
     def parse(self, s):
@@ -84,7 +84,6 @@ def categorize_expenses(lines, column_options):
     rules = Rule.query.all()
     default_account = Rule.query.first().account
 
-    index = None
     for i, column_option in enumerate(column_options):
         if column_option.title == DescriptionOption.title:
             index = i

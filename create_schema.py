@@ -1,4 +1,4 @@
-from personal_ledger import db
+from loader import db
 from models import Account, Transaction, Rule
 
 def create_schema():
