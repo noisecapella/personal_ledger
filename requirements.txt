@@ -11,4 +11,5 @@ distribute==0.6.24
 itsdangerous==0.22
 python-dateutil==2.1
 six==1.3.0
+unittest2==0.5.1
 wsgiref==0.1.2
