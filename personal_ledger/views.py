@@ -4,6 +4,7 @@ from forms import *
 from flask import Flask, request, session, g, redirect, url_for, \
      abort, render_template, flash
 import csv
+import re
 
 from categorize import categorize_expenses, categorize_columns, CATEGORIZE_COLUMN_OPTIONS
 
@@ -21,11 +22,8 @@ def accounts():
     accounts = Account.query.order_by(Account.full_title)
     return render_template('accounts.html', accounts=accounts, title="Accounts")
 
-@app.route('/add_account', methods=['POST', 'GET'])
+@app.route('/accounts/new', methods=['GET'])
 def add_account():
-    if request.method == 'POST':
-        flash("TODO: submit account info")
-        return redirect(url_for('accounts'))
     return render_template('add_account.html', title="Accounts")
 
 def _make_options():
@@ -40,44 +38,46 @@ def _make_options():
             Option("Number")]
 
 
-@app.route('/import_transactions', methods=['POST', 'GET'])
+@app.route('/import_transactions', methods=['GET'])
 def import_transactions():
     lines = None
     selections = None
-    if request.method == 'POST':
-        try:
-            file = request.files['file']
-        except Exception as e:
-            flash("Exception: %s" % e)
-            
+
     options = _make_options()
 
     return render_template('import_transactions.html', lines=lines, selections=selections, options=options, title="Transactions")
 
-
-@app.route('/rules', methods=['GET', 'POST'])
-def rules():
+@app.route('/rules/create', methods=['POST'])
+def rules_create():
     form = CreateRuleForm(request.form)
-    if request.method == "POST" and form.validate():
+    if form.validate():
         regex = form.regex.data
         account_id = form.account_id.data
         weight = form.weight.data
         rule = Rule(regex, Account.query.get(account_id), weight)
         db.session.add(rule)
         db.session.commit()
-        return redirect(url_for('rules'))
+    else:
+        flash("Form error")
+    return redirect(url_for('rules'))
 
+
+
+@app.route('/rules', methods=['GET'])
+def rules():
     rules = Rule.query.all()
-    
+    form = CreateRuleForm(request.form)
     return render_template('rules.html', title="Rules", rules=rules, form=form)
 
-@app.route('/rules/new', methods=['GET', 'POST'])
-def rules_new():
+@app.route('/rules/new_partial', methods=['GET', 'POST'])
+def rules_new_partial():
     form = CreateRuleForm(request.form)
-    return render_template('rules.html', title="Rules", rules=Rule.query.all(), form=form)
+    return render_template('add_rule_partial.html', title="Rules", form=form)
 
-@app.route('/categorize_transactions', methods=['POST'])
+@app.route('/categorize_transactions', methods=['GET', 'POST'])
 def categorize_transactions():
+    if request.method == 'GET':
+        return redirect(url_for('import_transactions'))
     file = request.files['file']
     if file:
         lines = [line for line in csv.reader(file)]

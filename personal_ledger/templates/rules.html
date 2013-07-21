@@ -3,14 +3,9 @@
 {% from "_formhelpers.html" import render_field %}
 
 {% block content %}
-<form action="{{ url_for('.rules') }}" method="post">
-  <dl>
-    {{ render_field(form.regex) }}
-    {{ render_field(form.account_id) }}
-    {{ render_field(form.weight) }}
-    <input type="submit" />
-  </dl>  
-</form>
+
+{% include "add_rule_partial.html" %}
+
 <button name="test_regex" id="test_regex">Test regex</button>
 
 <div id="transactions">

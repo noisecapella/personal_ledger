@@ -96,7 +96,8 @@ def categorize_expenses(lines, column_options):
         # TODO: make this better
         match_account = None
         for rule in rules:
-            if re.match(rule.regex, item):
+            print "Attempting " + rule.regex + " against " + item
+            if re.search(rule.regex, item):
                 if match_account is not None:
                     raise Exception("Multiple matches found. First was %s, second was %s" % (match_account, rule.account))
                 match_account = rule.account
