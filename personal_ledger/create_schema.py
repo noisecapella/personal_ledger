@@ -47,7 +47,8 @@ def create_schema():
                             'Electric':None,
                             'Garbage collection':None,
                             'Gas':None,
-                            'Water':None}}}
+                            'Water':None}},
+                    "Uncategorized" : None}
     write_account_tree(account_tree)
     db.session.commit()
 

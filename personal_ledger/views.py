@@ -71,6 +71,11 @@ def rules():
     
     return render_template('rules.html', title="Rules", rules=rules, form=form)
 
+@app.route('/rules/new', methods=['GET', 'POST'])
+def rules_new():
+    form = CreateRuleForm(request.form)
+    return render_template('rules.html', title="Rules", rules=Rule.query.all(), form=form)
+
 @app.route('/categorize_transactions', methods=['POST'])
 def categorize_transactions():
     file = request.files['file']

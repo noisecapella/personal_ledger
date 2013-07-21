@@ -5,30 +5,101 @@
   {% if select_columns %}
   <tr>
     {% for selection in select_columns %}
-    <th><select name='selection_{{ loop.index }}'>
-	{% for option in options %}
-	<option value='{{ option.title }}' {{ 'selected' if option.title == selection.title }}>{{ option.title }}</option>
-	{% endfor %}
-	</select>
+    <th><select id='selection_{{ loop.index - 1 }}' ></select>
     </th>
     {% endfor %}
     <th></th>
   </tr>
   {% endif %}
   {% for line, select_expense in pairs %}
-  <tr>
+  <tr id="row_{{ loop.index }}">
     {% for item in line %}
     <td>{{ item }}</td>
     {% endfor %}
     <td>
-      <select name='select_expenses_{{ loop.index }}'>
-	{% for account in accounts %}
-	<option value="{{ account.id }}" {{"selected" if select_expense.id == account.id }}>{{ account.title }}</option>
-        {% endfor %}
-      </select>
+      <select id='select_expenses_{{ loop.index - 1 }}' ></select>
+    <button id="add_rule_for_{{ loop.index }}">Add Rule</button>
     </td>
   </tr>
   {% endfor %}
 </table>
 {% endif %}
+{% endblock %}
+{% block js_footer_extra %}
+<script type="text/javascript">
+var getDescriptionColumnIndex = function() {
+    for (var i = 0; i < {{ select_columns.__len__() }}; i++) {
+        var select = $("#selection_" + i).get(0);
+        if (select.options[select.selectedIndex].text == "Description") {
+            return select.selectedIndex;
+        }
+    }
+    return -1;
+};
+
+var createClickHandler = function(i) {
+    return function() {
+        var description_column_index = getDescriptionColumnIndex();
+        var regex = "";
+        if (description_column_index >= 0) {
+            regex = $("#row_" + i + " td:eq(" + description_column_index + ")").val();
+        }
+        $.post({
+            account_id: i,
+            regex: regex,
+            weight: 1
+        });
+        return true;
+    };
+};
+
+var populateSelects = function() {
+    for (var i = 0; i < {{ select_columns.__len__() }}; i++) {
+        {% for option in options %}
+            $('#selection_' + i)
+                    .append($("<option/>")
+                    .attr("value", "{{ option.title }}")
+                    .text("{{ option.title }}"));
+        {% endfor %}
+
+    }
+        {% for option in options %}
+            {% set outer_loop = loop %}
+            {% for select in select_columns %}
+                {% if option.title == select.title %}
+                    $('#selection_{{ loop.index - 1 }} option').eq({{ outer_loop.index - 1}}).prop('selected', true);
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+
+    for (var i = 0; i < {{ pairs.__len__() }}; i++) {
+        {% for account in accounts %}
+            $("#select_expenses_" + i)
+                    .append($("<option/>")
+                            .attr("value", "{{ account.id }}")
+                            .text("{{ account.full_title }}"));
+        {% endfor %}
+    }
+
+    {% for account in accounts %}
+        {% set outer_loop = loop %}
+        {% for line, select_expense in pairs %}
+            {% if select_expense.id == account.id %}
+               $("#select_expenses_{{ loop.index - 1 }} option").eq({{ outer_loop.index - 1 }}).prop('selected', true);
+            {% endif %}
+        {% endfor %}
+    {% endfor %}
+
+};
+
+$(function() {
+    var numAccounts = {{ pairs.__len__() }};
+
+    populateSelects();
+
+    for (var i = 0; i < numAccounts; i++) {
+        $("#add_rule_for_" + i).click(createClickHandler(i));
+    }
+});
+</script>
 {% endblock %}

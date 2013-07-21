@@ -53,7 +53,7 @@ def guess(line):
                 if validation_row[i]:
                     validation_counts[i] += 1
 
-        
+
         max_validation_index = None
         for i in xrange(len(line)):
             if matches_made[i]:
@@ -63,7 +63,6 @@ def guess(line):
             elif validation_counts[max_validation_index] > validation_counts[i]:
                 max_validation_index = i
 
-        print matches_made, max_validation_index, validations, validation_counts
         for title, row in validations.items():
             if row[max_validation_index]:
                 matches_made[max_validation_index] = CATEGORIZE_COLUMN_OPTIONS_KEYS[title]
@@ -82,7 +81,7 @@ def guess(line):
 
 def categorize_expenses(lines, column_options):
     rules = Rule.query.all()
-    default_account = Rule.query.first().account
+    default_account = Account.query.filter(Account.title == "Uncategorized").first()
 
     for i, column_option in enumerate(column_options):
         if column_option.title == DescriptionOption.title:
@@ -95,9 +94,13 @@ def categorize_expenses(lines, column_options):
     def best_match(item):
         # for now any match is a good match
         # TODO: make this better
+        match_account = None
         for rule in rules:
             if re.match(rule.regex, item):
-                return rule.account
+                if match_account is not None:
+                    raise Exception("Multiple matches found. First was %s, second was %s" % (match_account, rule.account))
+                match_account = rule.account
+        return match_account
             
 
     ret = [(best_match(line[index]) or default_account)
