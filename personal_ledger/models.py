@@ -41,6 +41,7 @@ class Transaction(db.Model):
 
         self.description = description
         self.withdrawal = withdrawal
+        self.deposit = deposit
         self.account = account
         # note that other_transaction must be set before committing
 

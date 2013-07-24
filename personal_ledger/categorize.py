@@ -23,8 +23,16 @@ class DescriptionOption:
     def parse(self, s):
         return s
 
-class MoneyOption:
-    title = "Money"
+class DepositOption:
+    title = "Deposit"
+    def validate(self, s):
+        return re.match("\d+\.\d\d", s)
+
+    def parse(self, s):
+        return float(s)
+
+class WithdrawalOption:
+    title = "Withdrawal"
     def validate(self, s):
         return re.match("\d+\.\d\d", s)
 
@@ -33,7 +41,8 @@ class MoneyOption:
 
 CATEGORIZE_COLUMN_OPTIONS = [DateOption(),
                              DescriptionOption(),
-                             MoneyOption()]
+                             WithdrawalOption(),
+                             DepositOption()]
 
 CATEGORIZE_COLUMN_OPTIONS_KEYS = {option.title: option for option in CATEGORIZE_COLUMN_OPTIONS}
                                   

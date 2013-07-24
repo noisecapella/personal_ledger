@@ -100,10 +100,25 @@ def categorize_transactions():
                            pairs=pairs, options=options, accounts=accounts)
 
 
-@app.route('/save_transactions', methods=['POST'])
-def save_transactions():
-    pass
-    
+@app.route('/transactions/bulk_create', methods=['POST'])
+def transactions_bulk_create():
+    num_columns = int(request.form["num_columns"])
+    source_account_id = int(request.form["source_account_id"])
+    columns = {}
+    for column_num in xrange(num_columns):
+        columns.add(request.form["selection_" + str(column_num)])
+
+    return redirect(url_for(".transactions"))
+
+    num_transactions = int(request.form["num_transactions"])
+
+    source_account = Account.query.get(source_account_id)
+    for transaction_num in xrange(num_transactions):
+
+        transaction = Transaction(description, withdrawal, deposit, source_account)
+
+    return redirect(url_for(".transactions"))
+
 @app.route('/transactions_partial', methods=['GET'])
 def transactions_partial():
     transactions = Transaction.query.all()

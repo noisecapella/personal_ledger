@@ -1,5 +1,9 @@
 {% extends "layout.html" %}
 {% block content %}
+    <form action="{{ url_for(".transactions_bulk_create") }}" method="post" id="transactions_form">
+    <input type="submit" />
+    <input type="hidden" name="num_columns" value="{{ select_columns.__len__() if select_columns }}" />
+    <select id="source_account_id"></select>
   {% if lines %}
 <table class="table table-striped table-bordered">
   {% if select_columns %}
@@ -24,6 +28,9 @@
   {% endfor %}
 </table>
 {% endif %}
+</form>
+
+
     <div class="modal fade" id="add_rule">
         <div class="modal-header">
 
@@ -36,6 +43,9 @@
         </div>
     </div>
 {% endblock %}
+
+
+
 {% block js_footer_extra %}
 <script type="text/javascript">
     (function() {
@@ -117,6 +127,13 @@ var populateSelects = function(accounts_map) {
     }
 
     {% for account in accounts %}
+        $("#source_account_id")
+            .append($("<option/>")
+                        .attr("value", "{{ account.id }}")
+                        .text("{{ account.full_title }}"));
+    {% endfor %}
+
+    {% for account in accounts %}
         accounts_map["{{ account.full_title }}"] = {{ account.id }};
     {% endfor %}
 
@@ -139,15 +156,36 @@ var populateSelects = function(accounts_map) {
 };
 
 $(function() {
-    var numAccounts = {{ pairs.__len__() }};
+    var numTransactions = {{ pairs.__len__() }};
 
     var accounts_map = {};
     populateSelects(accounts_map);
 
-    for (var i = 0; i < numAccounts; i++) {
+    for (var i = 0; i < numTransactions; i++) {
         $("#add_rule_for_" + i).click(createClickHandler(i, accounts_map));
     }
+/*
+    $("#transactions_form").submit(function() {
+        var columns = [];
+        for (var i = 0; i < numColumns; i++) {
+            columns[i] = $("#selection_" + i).val();
+        }
 
+        var data = {}
+        for (var i = 0; i < numTransactions; i++) {
+            for (var j = 0; j < numColumns; j++) {
+                var column = columns[j];
+                data["row_" + i + "_" + column] = $("#row_" + i + " td:eq(" + j + ")").text();
+            }
+        }
+
+        $.post(data, function() {
+            console.log("Submitted");
+
+        });
+        return false;
+    });
+    */
 });
 
     })();
