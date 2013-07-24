@@ -6,6 +6,8 @@ from flask import Flask, request, session, g, redirect, url_for, \
 import csv
 import re
 
+import dateutil.parser
+
 from categorize import categorize_expenses, categorize_columns, CATEGORIZE_COLUMN_OPTIONS
 
 @app.route('/')
@@ -103,19 +105,53 @@ def categorize_transactions():
 @app.route('/transactions/bulk_create', methods=['POST'])
 def transactions_bulk_create():
     num_columns = int(request.form["num_columns"])
-    source_account_id = int(request.form["source_account_id"])
+    source_account_id = request.form["source_account_id"]
+
     columns = {}
     for column_num in xrange(num_columns):
-        columns.add(request.form["selection_" + str(column_num)])
+        columns[request.form["selection_" + str(column_num)]] = column_num
 
-    return redirect(url_for(".transactions"))
 
     num_transactions = int(request.form["num_transactions"])
 
     source_account = Account.query.get(source_account_id)
     for transaction_num in xrange(num_transactions):
+        if "Description" in columns:
+            description = request.form["cell_" + str(transaction_num) + "_" + str(columns["Description"])]
+        else:
+            description = "Unspecified description"
 
-        transaction = Transaction(description, withdrawal, deposit, source_account)
+        if "Withdrawal" in columns:
+            withdrawal = request.form["cell_" + str(transaction_num) + "_" + str(columns["Withdrawal"])]
+        else:
+            withdrawal = 0
+        if "Deposit" in columns:
+            deposit = request.form["cell_" + str(transaction_num) + "_" + str(columns["Deposit"])]
+        else:
+            deposit = 0
+        if "Date" in columns:
+            date_string = request.form["cell_" + str(transaction_num) + "_" + str(columns["Date"])]
+        else:
+            date_string = "01/01/1900"
+        date = dateutil.parser.parse(date_string)
+
+        other_account_id = request.form["select_expenses_" + str(transaction_num)]
+        other_account = Account.query.get(other_account_id)
+        transaction = Transaction(description, withdrawal, deposit, source_account, date)
+        other_transaction = Transaction(description, deposit, withdrawal, other_account, date)
+
+        # temporarily satisfy NOT NULL requirement
+        transaction.other_transaction_id = -1
+        other_transaction.other_transaction_id = -1
+
+        db.session.add(transaction)
+        db.session.add(other_transaction)
+        db.session.flush()
+
+        transaction.other_transaction_id = other_transaction.id
+        other_transaction.other_transaction_id = transaction.id
+
+        db.session.commit()
 
     return redirect(url_for(".transactions"))
 

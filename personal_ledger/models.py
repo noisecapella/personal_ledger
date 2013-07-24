@@ -32,10 +32,11 @@ class Transaction(db.Model):
     description = db.Column(db.Text, nullable=False)
     withdrawal = db.Column(db.Float, nullable=False)
     deposit = db.Column(db.Float, nullable=False)
+    date = db.Column(db.Date, nullable=False)
     account_id = db.Column(db.Integer, db.ForeignKey('account.id'), nullable=False)
     other_transaction_id = db.Column(db.Integer, db.ForeignKey('transaction.id'), nullable=False)
 
-    def __init__(self, description, withdrawal, deposit, account):
+    def __init__(self, description, withdrawal, deposit, account, date):
         if not withdrawal and not deposit:
             raise Exception("Must have a non-zero withdrawal or deposit")
 
@@ -43,6 +44,7 @@ class Transaction(db.Model):
         self.withdrawal = withdrawal
         self.deposit = deposit
         self.account = account
+        self.date = date
         # note that other_transaction must be set before committing
 
 Transaction.account = db.relation('Account', backref='transaction')
