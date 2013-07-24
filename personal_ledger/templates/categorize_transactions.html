@@ -73,6 +73,14 @@ var createClickHandler = function(i, accounts_map) {
     };
 };
 
+var createSelectHandler = function(i) {
+    return function() {
+        var select = $("#select_expenses_" + i).get(0);
+        var selectText = select.options[select.selectedIndex].text;
+        
+    }
+}
+
 var populateSelects = function(accounts_map) {
     for (var i = 0; i < {{ select_columns.__len__() }}; i++) {
         {% for option in options %}
@@ -114,6 +122,9 @@ var populateSelects = function(accounts_map) {
         {% endfor %}
     {% endfor %}
 
+    for (var i = 0; i < {{ pairs.__len__() }}; i++) {
+        $("#select_expenses_" + i).change(createSelectHandler(i));
+    }
 };
 
 $(function() {
