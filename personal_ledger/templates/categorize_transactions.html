@@ -77,7 +77,14 @@ var createSelectHandler = function(i) {
     return function() {
         var select = $("#select_expenses_" + i).get(0);
         var selectText = select.options[select.selectedIndex].text;
-        
+        if (selectText == "Uncategorized") {
+            $("#select_expenses_" + i).addClass("uncategorized");
+        }
+        else
+        {
+            $("#select_expenses_" + i).removeClass("uncategorized");
+        }
+
     }
 }
 
@@ -117,13 +124,17 @@ var populateSelects = function(accounts_map) {
         {% set outer_loop = loop %}
         {% for line, select_expense in pairs %}
             {% if select_expense.id == account.id %}
-               $("#select_expenses_{{ loop.index - 1 }} option").eq({{ outer_loop.index - 1 }}).prop('selected', true);
+                $("#select_expenses_{{ loop.index - 1 }} option").eq({{ outer_loop.index - 1 }}).prop('selected', true);
             {% endif %}
         {% endfor %}
     {% endfor %}
 
     for (var i = 0; i < {{ pairs.__len__() }}; i++) {
-        $("#select_expenses_" + i).change(createSelectHandler(i));
+        var selectHandler = createSelectHandler(i)
+        $("#select_expenses_" + i).change(selectHandler);
+
+        // call once to initialize
+        selectHandler();
     }
 };
 
@@ -136,6 +147,7 @@ $(function() {
     for (var i = 0; i < numAccounts; i++) {
         $("#add_rule_for_" + i).click(createClickHandler(i, accounts_map));
     }
+
 });
 
     })();

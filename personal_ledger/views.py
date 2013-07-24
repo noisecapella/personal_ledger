@@ -57,9 +57,10 @@ def rules_create():
         rule = Rule(regex, Account.query.get(account_id), weight)
         db.session.add(rule)
         db.session.commit()
+        flash("New rule created")
     else:
         flash("Form error")
-    return redirect(url_for('rules'))
+    return redirect(url_for('import_transactions'))
 
 
 

@@ -1,6 +1,6 @@
 {% from "_formhelpers.html" import render_field %}
 
-<form action="{{ url_for('.rules_create') }}" method="post">
+<form id="add_rule_form" action="{{ url_for('.rules_create') }}" method="post">
   <dl>
     {{ render_field(form.regex) }}
     {{ render_field(form.account_id) }}
@@ -8,3 +8,4 @@
     <input type="submit" />
   </dl>
 </form>
+
