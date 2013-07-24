@@ -11,7 +11,7 @@
     <td>{{ transaction.description }}</td>
     <td>{{ transaction.withdrawal }}</td>
     <td>{{ transaction.deposit }}</td>
-    <td>{{ transaction.account_name }}</td>
+    <td>{{ transaction.account.full_title }}</td>
     <td>{{ transaction.other_transaction_id }}</td>
   </tr>
   {% else %}
