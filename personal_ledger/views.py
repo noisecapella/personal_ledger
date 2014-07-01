@@ -9,6 +9,7 @@ import re
 import dateutil.parser
 
 from categorize import categorize_expenses, categorize_columns, CATEGORIZE_COLUMN_OPTIONS
+import json
 
 @app.route('/')
 def index():
@@ -52,17 +53,21 @@ def import_transactions():
 @app.route('/rules/create', methods=['POST'])
 def rules_create():
     form = CreateRuleForm(request.form)
+
     if form.validate():
-        regex = form.regex.data
-        account_id = form.account_id.data
-        weight = form.weight.data
-        rule = Rule(regex, Account.query.get(account_id), weight)
+        rule = Rule(form.rule_type.data,
+                    form.regex.data,
+                    Account.query.get(form.account_id.data),
+                    form.weight.data)
         db.session.add(rule)
         db.session.commit()
         flash("New rule created")
     else:
         flash("Form error")
-    return redirect(url_for('import_transactions'))
+        raise Exception("Form errors: %s" % form.errors)
+
+    return json.dumps({'html' : (render_template('categorize_transactions_partial.html') +
+                                 render_template('categorize_transactions_partial_js.html'))})
 
 
 
@@ -71,6 +76,8 @@ def rules():
     rules = Rule.query.all()
     form = CreateRuleForm(request.form)
     return render_template('rules.html', title="Rules", rules=rules, form=form)
+
+
 
 @app.route('/rules/new_partial', methods=['GET', 'POST'])
 def rules_new_partial():
@@ -84,14 +91,12 @@ def categorize_transactions():
     file = request.files['file']
     if file:
         lines = [line for line in csv.reader(file)]
-        max_length = 0
-        for line in lines:
-            max_length = max(max_length, len(line))
-            
+
         select_columns = categorize_columns(lines)
         select_expenses = categorize_expenses(lines, select_columns)
     else:
         flash("File was not uploaded")
+        return redirect(url_for('import_transactions'))
 
     options = CATEGORIZE_COLUMN_OPTIONS
     accounts = Account.query.order_by(Account.full_title).all()

@@ -92,20 +92,30 @@ def categorize_expenses(lines, column_options):
     rules = Rule.query.all()
     default_account = Account.query.filter(Account.title == "Uncategorized").first()
 
+    description_index = None
+    amount_index = None
     for i, column_option in enumerate(column_options):
         if column_option.title == DescriptionOption.title:
-            index = i
-            break
-    else:
-        print("No description column found")
-        return [default_account] * len(lines)
+            description_index = i
+        elif column_option.title == DepositOption.title or column_option.title == WithdrawalOption.title:
+            amount_index = i
 
-    def best_match(item):
+    if description_index is None or amount_index is None:
+        raise Exception("No description column found")
+
+    def best_match(line):
         # for now any match is a good match
         # TODO: make this better
+
         match_account = None
         for rule in rules:
-            print "Attempting " + rule.regex + " against " + item
+            if rule.rule_type == Rule.use_description:
+                item = line[description_index]
+            elif rule.rule_type == Rule.use_amount:
+                item = line[amount_index]
+            else:
+                raise Exception("Unable to find rule type")
+            print("Attempting " + rule.regex + " against " + item)
             if re.search(rule.regex, item):
                 if match_account is not None:
                     raise Exception("Multiple matches found. First was %s, second was %s" % (match_account, rule.account))
@@ -113,7 +123,7 @@ def categorize_expenses(lines, column_options):
         return match_account
             
 
-    ret = [(best_match(line[index]) or default_account)
+    ret = [(best_match(line) or default_account)
            for line in lines]
 
     return ret

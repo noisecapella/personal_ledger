@@ -1,0 +1,121 @@
+    <script type="text/javascript">
+    $(function() {
+var getDescriptionColumnIndex = function() {
+    for (var i = 0; i < {{ select_columns.__len__() }}; i++) {
+        var select = $("#selection_" + i).get(0);
+        if (select.options[select.selectedIndex].text == "Description") {
+            return select.selectedIndex;
+        }
+    }
+    return -1;
+};
+
+var createClickHandler = function(i, accounts_map) {
+    return function() {
+        var description_column_index = getDescriptionColumnIndex();
+        var regex = "";
+        if (description_column_index >= 0) {
+            regex = $("#row_" + i + " td:eq(" + description_column_index + ")").text();
+        }
+
+        var select_expense = $("#select_expenses_" + i).get(0);
+        var select_expense_selected = select_expense.options[select_expense.selectedIndex].text;
+
+        $.post("{{ url_for('.rules_new_partial') }}", {
+            account_id: accounts_map[select_expense_selected],
+            regex: regex,
+            weight: 1
+        }, function(data) {
+            $("#add_rule .modal-body").html(data);
+            $("#add_rule").modal();
+
+        });
+        return false;
+    };
+};
+
+var createSelectHandler = function(i) {
+    return function() {
+        var select = $("#select_expenses_" + i).get(0);
+        var selectText = select.options[select.selectedIndex].text;
+        if (selectText == "Uncategorized") {
+            $("#select_expenses_" + i).addClass("uncategorized");
+        }
+        else
+        {
+            $("#select_expenses_" + i).removeClass("uncategorized");
+        }
+
+    }
+}
+
+var populateSelects = function(accounts_map) {
+    for (var i = 0; i < {{ select_columns.__len__() }}; i++) {
+        {% for option in options %}
+            $('#selection_' + i)
+                    .append($("<option/>")
+                    .attr("value", "{{ option.title }}")
+                    .text("{{ option.title }}"));
+        {% endfor %}
+
+    }
+        {% for option in options %}
+            {% set outer_loop = loop %}
+            {% for select in select_columns %}
+                {% if option.title == select.title %}
+                    $('#selection_{{ loop.index - 1 }} option').eq({{ outer_loop.index - 1}}).prop('selected', true);
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+
+    for (var i = 0; i < {{ pairs.__len__() }}; i++) {
+        {% for account in accounts %}
+            $("#select_expenses_" + i)
+                    .append($("<option/>")
+                            .attr("value", "{{ account.id }}")
+                            .text("{{ account.full_title }}"));
+        {% endfor %}
+    }
+
+    {% for account in accounts %}
+        $("#source_account_id")
+            .append($("<option/>")
+                        .attr("value", "{{ account.id }}")
+                        .text("{{ account.full_title }}"));
+    {% endfor %}
+
+    {% for account in accounts %}
+        accounts_map["{{ account.full_title }}"] = {{ account.id }};
+    {% endfor %}
+
+    {% for account in accounts %}
+        {% set outer_loop = loop %}
+        {% for line, select_expense in pairs %}
+            {% if select_expense.id == account.id %}
+                $("#select_expenses_{{ loop.index - 1 }} option").eq({{ outer_loop.index - 1 }}).prop('selected', true);
+            {% endif %}
+        {% endfor %}
+    {% endfor %}
+
+    for (var i = 0; i < {{ pairs.__len__() }}; i++) {
+        var selectHandler = createSelectHandler(i)
+        $("#select_expenses_" + i).change(selectHandler);
+
+        // call once to initialize
+        selectHandler();
+    }
+};
+
+$(function() {
+    var numTransactions = {{ pairs.__len__() }};
+
+    var accounts_map = {};
+    populateSelects(accounts_map);
+
+    for (var i = 0; i < numTransactions; i++) {
+        $("#add_rule_for_" + i).click(createClickHandler(i, accounts_map));
+    }
+});
+
+    });
+</script>

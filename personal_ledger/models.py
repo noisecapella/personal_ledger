@@ -18,11 +18,18 @@ class Account(db.Model):
 
 class Rule(db.Model):
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    rule_type = db.Column(db.Text, nullable=False)
     regex = db.Column(db.Text, nullable=False)
     account_id = db.Column(db.Integer, db.ForeignKey("account.id"), nullable=False)
     weight = db.Column(db.Float, nullable=False)
 
-    def __init__(self, regex, account, weight):
+    use_description = "use_description"
+    use_amount = "use_amount"
+
+    def __init__(self, rule_type, regex, account, weight):
+        if rule_type != self.use_amount and rule_type != self.use_description:
+            raise Exception("Unknown rule_type")
+        self.rule_type = rule_type
         self.regex = regex
         self.account = account
         self.weight = weight

@@ -1,11 +1,24 @@
 {% from "_formhelpers.html" import render_field %}
 
-<form id="add_rule_form" action="{{ url_for('.rules_create') }}" method="post">
+<form id="add_rule_form"  method="post">
   <dl>
+      {{ render_field(form.rule_type) }}
     {{ render_field(form.regex) }}
     {{ render_field(form.account_id) }}
     {{ render_field(form.weight) }}
-    <input type="submit" />
+    <input type="submit" onclick="$.post('{{ url_for('.rules_create') }}',
+      $(this).parents('form').serialize(),
+            function (data) {
+                $('#categorize_transaction').html(data['html']);
+            }); return false;"/>
   </dl>
 </form>
 
+<script>
+$(function() {
+    $("#add_rule_form").ajaxSubmit({
+        url: "{{ url_for('.rules_create') }}",
+        type: "post"
+    });
+});
+</script>

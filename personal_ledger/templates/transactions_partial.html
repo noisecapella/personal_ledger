@@ -5,6 +5,7 @@
     <th>Deposit</th>
     <th>Account</th>
     <th>Other transaction id</th>
+    <th>Date</th>
   </tr>
   {% for transaction in transactions %}
   <tr>
@@ -13,6 +14,7 @@
     <td>{{ transaction.deposit }}</td>
     <td>{{ transaction.account.full_title }}</td>
     <td>{{ transaction.other_transaction_id }}</td>
+    <td>{{ transaction.date }}</td>
   </tr>
   {% else %}
   <tr>
