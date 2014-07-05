@@ -8,6 +8,9 @@ import re
 
 import dateutil.parser
 
+from sqlalchemy.sql.expression import func
+
+
 from categorize import categorize_expenses, categorize_columns, CATEGORIZE_COLUMN_OPTIONS
 import json
 
@@ -17,12 +20,27 @@ def index():
 
 @app.route('/transactions')
 def transactions():
-    transactions = Transaction.query.all()
+    transactions = Transaction.query.order_by(Transaction.date.desc())
     return render_template('transactions.html', transactions=transactions, title="Transactions")
 
 @app.route('/accounts')
 def accounts():
-    accounts = Account.query.order_by(Account.full_title)
+    accounts = (db.session.query(
+        func.sum(Transaction.withdrawal),
+        func.sum(Transaction.deposit),
+        Account.full_title)
+                .select_from(Account)
+                .join(Transaction)
+                .group_by(Account.id)
+                .order_by(Account.full_title)
+                .all())
+
+    def relabel(account):
+        return {"withdrawal": account[0],
+                "deposit": account[1],
+                "full_title": account[2]}
+                
+    accounts = [relabel(account) for account in accounts]
     return render_template('accounts.html', accounts=accounts, title="Accounts")
 
 @app.route('/accounts/new', methods=['GET'])
@@ -162,7 +180,7 @@ def transactions_bulk_create():
 
 @app.route('/transactions_partial', methods=['GET'])
 def transactions_partial():
-    transactions = Transaction.query.all()
+    transactions = Transaction.query.order_by(Transaction.date.desc())
     regex = request.args.get('regex')
     if regex:
         transactions = [transaction for transaction in transactions
