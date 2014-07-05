@@ -10,7 +10,6 @@ import dateutil.parser
 
 from sqlalchemy.sql.expression import func
 
-
 from categorize import categorize_expenses, categorize_columns, CATEGORIZE_COLUMN_OPTIONS
 import json
 
@@ -25,15 +24,30 @@ def transactions():
 
 @app.route('/accounts')
 def accounts():
-    accounts = (db.session.query(
+    month_year = request.args.get('month_year')
+    month_years = (db.session.query(func.strftime("%m-%Y", Transaction.date))
+                   .select_from(Transaction)
+                   .distinct()
+                   .order_by(func.strftime("%Y-%m", Transaction.date))
+                   .all()
+                   )
+    month_years = [each[0] for each in month_years]
+
+    accounts_query = (db.session.query(
         func.sum(Transaction.withdrawal),
         func.sum(Transaction.deposit),
         Account.full_title)
                 .select_from(Account)
-                .join(Transaction)
+                .outerjoin(Transaction)
                 .group_by(Account.id)
                 .order_by(Account.full_title)
-                .all())
+                )
+
+    if month_year:
+        accounts_query = accounts_query.filter(func.strftime("%m-%Y", Transaction.date) == month_year)
+
+    accounts = accounts_query.all()
+                
 
     def relabel(account):
         return {"withdrawal": account[0],
@@ -41,7 +55,8 @@ def accounts():
                 "full_title": account[2]}
                 
     accounts = [relabel(account) for account in accounts]
-    return render_template('accounts.html', accounts=accounts, title="Accounts")
+    return render_template('accounts.html', accounts=accounts, title="Accounts", month_year=month_year, month_years=month_years)
+    
 
 @app.route('/accounts/new', methods=['GET'])
 def add_account():
@@ -120,6 +135,14 @@ def categorize_transactions():
     accounts = Account.query.order_by(Account.full_title).all()
 
     pairs = [(lines[i], select_expenses[i]) for i in xrange(len(lines))]
+
+    def uncategorized_first(pair):
+        if pair[1].title == "Uncategorized":
+            return 0
+        else:
+            return 1
+
+    pairs = sorted(pairs, key=uncategorized_first)
 
     return render_template('categorize_transactions.html', lines=lines, select_columns=select_columns,
                            pairs=pairs, options=options, accounts=accounts)

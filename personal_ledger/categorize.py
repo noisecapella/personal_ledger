@@ -108,6 +108,7 @@ def categorize_expenses(lines, column_options):
         # TODO: make this better
 
         match_account = None
+        matched_rule = None
         for rule in rules:
             if rule.rule_type == Rule.use_description:
                 item = line[description_index]
@@ -115,10 +116,12 @@ def categorize_expenses(lines, column_options):
                 item = line[amount_index]
             else:
                 raise Exception("Unable to find rule type")
-            print("Attempting " + rule.regex + " against " + item)
-            if re.search(rule.regex, item):
+            #print("Attempting " + rule.regex + " against " + item)
+            if rule.regex.lower() in item.lower():
                 if match_account is not None:
-                    raise Exception("Multiple matches found. First was %s, second was %s" % (match_account, rule.account))
+                    #raise Exception("Multiple matches found. First account was %s, second account was %s. Previous regex was %s, current regex is %s, item is %s" % (match_account.full_title, rule.account.full_title, matched_rule.regex, rule.regex, item))
+                    return None
+                matched_rule = rule
                 match_account = rule.account
         return match_account
             

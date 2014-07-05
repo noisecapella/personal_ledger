@@ -1,6 +1,15 @@
 {% extends "layout.html" %}
 {% block content %}
 <table class="table table-striped table-bordered">
+  <form action="{{ url_for('.accounts') }}">
+  <select name="month_year">
+    <option value="">All rows</option>
+    {% for month_year_item in month_years %}
+    <option value="{{month_year_item }}" {% if month_year %} selected='true' {% endif %}>{{month_year_item}}</option>
+    {% endfor %}
+  </select>
+  <input type="Submit" />
+  </form>
 
   <tr>
     <th>Title</th>
